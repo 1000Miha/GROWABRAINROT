@@ -13,7 +13,6 @@
 
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
-            /* The Rainbow background you liked */
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradient 10s ease infinite;
@@ -43,7 +42,6 @@
             text-shadow: 4px 4px #ff0000, -3px -3px #0000ff;
             margin-bottom: 1.5rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
         .video-container {
@@ -62,7 +60,6 @@
             object-fit: cover;
         }
 
-        /* This button now just exists for the vibe—it doesn't redirect */
         .play-button {
             background: #ff0000;
             color: white;
@@ -77,26 +74,16 @@
             display: inline-flex;
             align-items: center;
             gap: 15px;
-            text-decoration: none;
             animation: vibrate 0.1s infinite;
         }
 
         .play-button:hover {
             background: #00ff00;
             color: #000;
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 0 40px #00ff00;
         }
 
-        .warning-text {
-            margin-top: 25px;
-            font-size: 1.1rem;
-            color: #ffff00;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-
-        /* Animations */
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -119,22 +106,36 @@
         <h1 class="title">GROW A BRAINROT</h1>
         
         <div class="video-container">
-            <video class="game-video" autoplay loop muted playsinline>
+            <video id="myVideo" class="game-video" autoplay loop muted playsinline>
                 <source src="video.mp4" type="video/mp4">
             </video>
         </div>
 
         <br>
 
-        <div class="play-button">
-            <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-            </svg>
-            PLAY NOW
-        </div>
+        <button onclick="toggleSound()" class="play-button" id="btn">
+            UNMUTE AUDIO
+        </button>
 
-        <p class="warning-text">FULLY SAFE - NO VIRUS - FREE ROBUX INCLUDED</p>
+        <p style="margin-top:20px; color: yellow; font-weight: bold;">FULLY SAFE - NO VIRUS - FREE ROBUX INCLUDED</p>
     </div>
+
+    <script>
+        function toggleSound() {
+            var video = document.getElementById("myVideo");
+            var btn = document.getElementById("btn");
+            
+            if (video.muted) {
+                video.muted = false;
+                btn.innerHTML = "MUTE AUDIO";
+                btn.style.background = "#555";
+            } else {
+                video.muted = true;
+                btn.innerHTML = "UNMUTE AUDIO";
+                btn.style.background = "#ff0000";
+            }
+        }
+    </script>
 
 </body>
 </html>
