@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GROW A BRAINROT(NO TROJAN)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+            /* Animated Rainbow Background */
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .game-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 8px ridge #00ff00;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 0 50px #ff00ff, inset 0 0 20px #00ffff;
+            max-width: 500px;
+            width: 95%;
+            z-index: 10;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 4px 4px #ff0000, -3px -3px #0000ff;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            height: 300px;
+        }
+
+        .game-icon {
+            max-width: 100%;
+            max-height: 100%;
+            border: 5px solid #fff;
+            border-radius: 15px;
+            object-fit: contain;
+            /* Animation removed so image does not move */
+        }
+
+        .play-button {
+            background: #ff0000;
+            color: white;
+            padding: 20px 60px;
+            font-size: 2rem;
+            font-weight: 900;
+            border: 4px solid #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #ff0000;
+            transition: all 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            animation: vibrate 0.1s infinite;
+        }
+
+        .play-button:hover {
+            background: #00ff00;
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 40px #00ff00;
+        }
+
+        .warning-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #ffff00;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-card">
+        <h1 class="title">GROW A BRAINROT</h1>
+        
+        <div class="image-container">
+            <img src="https://i.imgur.com/Ohxn6Lc.jpeg" alt="Brainrot Icon" class="game-icon">
+        </div>
+
+        <br>
+
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="play-button">
+            <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            PLAY NOW
+        </a>
+
+        <p class="warning-text">FULLY SAFE - NO VIRUS - FREE ROBUX INCLUDED</p>
+    </div>
+
+</body>
+</html>
