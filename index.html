@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
-            /* Animated Rainbow Background */
+            /* The Rainbow background you liked */
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradient 10s ease infinite;
@@ -29,7 +29,7 @@
             background: rgba(0, 0, 0, 0.9);
             border: 8px ridge #00ff00;
             border-radius: 20px;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             box-shadow: 0 0 50px #ff00ff, inset 0 0 20px #00ffff;
             max-width: 500px;
@@ -46,7 +46,7 @@
             letter-spacing: 2px;
         }
 
-        .image-container {
+        .video-container {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -54,15 +54,15 @@
             height: 300px;
         }
 
-        .game-icon {
+        .game-video {
             max-width: 100%;
             max-height: 100%;
             border: 5px solid #fff;
             border-radius: 15px;
-            object-fit: contain;
-            /* Animation removed so image does not move */
+            object-fit: cover;
         }
 
+        /* This button now just exists for the vibe—it doesn't redirect */
         .play-button {
             background: #ff0000;
             color: white;
@@ -89,13 +89,14 @@
         }
 
         .warning-text {
-            margin-top: 20px;
+            margin-top: 25px;
             font-size: 1.1rem;
             color: #ffff00;
             font-weight: bold;
             text-decoration: underline;
         }
 
+        /* Animations */
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -117,18 +118,20 @@
     <div class="game-card">
         <h1 class="title">GROW A BRAINROT</h1>
         
-        <div class="image-container">
-            <img src="https://i.imgur.com/Ohxn6Lc.jpeg" alt="Brainrot Icon" class="game-icon">
+        <div class="video-container">
+            <video class="game-video" autoplay loop muted playsinline>
+                <source src="video.mp4" type="video/mp4">
+            </video>
         </div>
 
         <br>
 
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="play-button">
+        <div class="play-button">
             <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z"/>
             </svg>
             PLAY NOW
-        </a>
+        </div>
 
         <p class="warning-text">FULLY SAFE - NO VIRUS - FREE ROBUX INCLUDED</p>
     </div>
