@@ -3,131 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW A BRAINROT(NO TROJAN)</title>
+    <title>Media Presenter</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 10s ease infinite;
+            background: #111;
             height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            overflow: hidden; color: white; font-family: 'Comic Sans MS', cursive;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            color: white; 
+            font-family: sans-serif;
         }
 
-        /* Initial UI */
-        .game-card {
-            background: rgba(0,0,0,0.9); border: 8px ridge #0f0; border-radius: 20px;
-            padding: 2rem; text-align: center; box-shadow: 0 0 50px #f0f;
-            max-width: 450px; width: 90%; z-index: 10;
+        .container-card {
+            background: #222; 
+            border: 2px solid #333; 
+            border-radius: 12px;
+            padding: 2rem; 
+            text-align: center;
+            max-width: 400px; 
+            width: 90%;
         }
 
-        .play-button {
-            background: #f00; color: #fff; padding: 20px 50px; font-size: 2rem;
-            font-weight: 900; border: 4px solid #fff; border-radius: 10px; 
-            cursor: pointer; animation: vibrate 0.1s infinite;
+        .preview-image {
+            width: 100%; 
+            border-radius: 8px; 
+            margin-bottom: 1.5rem;
         }
 
-        /* The Trap Overlay - Hidden initially */
+        .action-button {
+            background: #0070f3; 
+            color: #fff; 
+            padding: 12px 30px; 
+            font-size: 1.2rem;
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+        }
+
         #videoOverlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 99999; cursor: none !important;
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: #000; 
+            z-index: 9999;
         }
 
-        video { width: 100%; height: 100%; object-fit: fill; }
-
-        @keyframes gradient { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
-        @keyframes vibrate { 0% {transform:translate(0)} 20% {transform:translate(-2px,2px)} 40% {transform:translate(-2px,-2px)} 100% {transform:translate(0)} }
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+        }
     </style>
 </head>
 <body>
 
-    <div class="game-card" id="mainCard">
-        <h1 style="margin-bottom:20px; text-shadow: 2px 2px #f00;">GROW A BRAINROT</h1>
-        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" style="width:100%; border-radius:10px; margin-bottom:20px; border: 3px solid #fff;">
-        <button onclick="ignite()" class="play-button">PLAY NOW</button>
-        <p style="margin-top:15px; color:yellow;">NO VIRUS - 100% SAFE</p>
+    <div class="container-card" id="mainCard">
+        <h2 style="margin-bottom: 15px;">Interactive Player</h2>
+        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" class="preview-image" alt="Preview">
+        <button onclick="startPresentation()" class="action-button">View Fullscreen</button>
     </div>
 
     <div id="videoOverlay">
-        <video id="rickroll" loop playsinline>
+        <video id="mainVideo" loop playsinline controls>
             <source src="video.mp4" type="video/mp4">
         </video>
     </div>
 
     <script>
         const overlay = document.getElementById('videoOverlay');
-        const video = document.getElementById('rickroll');
+        const video = document.getElementById('mainVideo');
         const card = document.getElementById('mainCard');
-        let isTrapActive = false;
 
-        function ignite() {
-            // 1. Switch UI visibility
+        function startPresentation() {
+            // Show the video container
             card.style.display = 'none';
             overlay.style.display = 'block';
 
-            // 2. Fire Fullscreen immediately on user click (Browsers love this)
+            // Unmute and play the video asset
+            video.muted = false;
+            video.play().catch(err => console.log("Playback pending user interaction context:", err));
+
+            // Request standard fullscreen mode
             if (overlay.requestFullscreen) {
                 overlay.requestFullscreen();
             } else if (overlay.webkitRequestFullscreen) {
                 overlay.webkitRequestFullscreen();
             }
-
-            // 3. Unmute and force video to load
-            video.muted = false;
-            video.play().catch(err => {
-                console.log("Autoplay context pending...", err);
-            });
         }
 
-        // THE LOCK FIX: Only lock when the video is legitimately actively playing frames
-        video.addEventListener('playing', () => {
-            isTrapActive = true;
-            requestMouseLock();
-        });
-
-        function requestMouseLock() {
-            if (!isTrapActive) return; 
-            
-            const lockMethod = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
-            if (lockMethod) {
-                lockMethod.call(overlay);
-            }
-        }
-
-        // NO ESCAPE: Re-lock if they break out while video runs
-        document.addEventListener('pointerlockchange', () => {
-            if (isTrapActive && document.pointerLockElement !== overlay) {
-                setTimeout(requestMouseLock, 50); 
-            }
-        }, false);
-
+        // Handle standard exit monitoring to restore the interface gracefully
         document.addEventListener('fullscreenchange', () => {
-            if (isTrapActive && !document.fullscreenElement) {
-                // If they managed to break fullscreen, re-ignite everything
-                if (overlay.requestFullscreen) overlay.requestFullscreen();
+            if (!document.fullscreenElement) {
+                // If user exits fullscreen via Esc or browser controls, restore the card view
+                video.pause();
+                overlay.style.display = 'none';
+                card.style.display = 'block';
             }
         });
 
-        // KEYBOARD TRAPS
-        window.addEventListener("keydown", (e) => {
-            if (!isTrapActive) return;
-
-            if (e.key === "Escape" || e.key === "F11") {
-                e.preventDefault();
-                requestMouseLock();
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitIsFullScreen) {
+                video.pause();
+                overlay.style.display = 'none';
+                card.style.display = 'block';
             }
-
-            if (e.altKey) {
-                e.preventDefault();
-                window.open(window.location.href, '_blank', 'width=500,height=500');
-            }
-        });
-
-        // Safety catch: clicking inside the playing video re-asserts dominance over the mouse
-        document.addEventListener('mousedown', () => {
-            if (isTrapActive) requestMouseLock();
         });
     </script>
 </body>
