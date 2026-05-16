@@ -16,7 +16,6 @@
             overflow: hidden; color: white; font-family: 'Comic Sans MS', cursive;
         }
 
-        /* Initial UI */
         .game-card {
             background: rgba(0,0,0,0.9); border: 8px ridge #0f0; border-radius: 20px;
             padding: 2rem; text-align: center; box-shadow: 0 0 50px #f0f;
@@ -29,10 +28,9 @@
             cursor: pointer; animation: vibrate 0.1s infinite;
         }
 
-        /* The Trap Overlay - Hidden initially */
         #videoOverlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 99999; cursor: none !important;
+            background: #000; z-index: 99999;
         }
 
         video { width: 100%; height: 100%; object-fit: fill; }
@@ -60,97 +58,32 @@
         const overlay = document.getElementById('videoOverlay');
         const video = document.getElementById('rickroll');
         const card = document.getElementById('mainCard');
-        let isTrapActive = false;
-
-        // Automatically trigger if url has #infect parameter (for the Alt windows)
-        window.addEventListener('load', () => {
-            if (window.location.hash === '#infect') {
-                setTimeout(() => {
-                    ignite();
-                }, 400);
-            }
-        });
 
         function ignite() {
             card.style.display = 'none';
             overlay.style.display = 'block';
 
-            // Fire Fullscreen
-            forceFullscreen();
-
-            video.muted = false;
-            video.play().catch(err => console.log("Waiting for interaction...", err));
-        }
-
-        function forceFullscreen() {
             if (overlay.requestFullscreen) {
                 overlay.requestFullscreen();
             } else if (overlay.webkitRequestFullscreen) {
                 overlay.webkitRequestFullscreen();
             }
+
+            video.muted = false;
+            video.play().catch(err => console.log("Playback interaction required."));
         }
 
-        video.addEventListener('playing', () => {
-            isTrapActive = true;
-            requestMouseLock();
-        });
-
-        function requestMouseLock() {
-            if (!isTrapActive) return; 
-            const lockMethod = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
-            if (lockMethod) {
-                lockMethod.call(overlay);
+        // Standard exit listener to handle recovery cleanly
+        function handleExit() {
+            if (!document.fullscreenElement && !document.webkitIsFullScreen) {
+                video.pause();
+                overlay.style.display = 'none';
+                card.style.display = 'block';
             }
         }
 
-        // PHYSICAL ESCAPE / F11 COUNTER-MEASURE
-        document.addEventListener('fullscreenchange', () => {
-            if (isTrapActive && !document.fullscreenElement) {
-                forceFullscreen();
-                setTimeout(requestMouseLock, 50);
-            }
-        });
-
-        document.addEventListener('webkitfullscreenchange', () => {
-            if (isTrapActive && !document.webkitIsFullScreen) {
-                forceFullscreen();
-                setTimeout(requestMouseLock, 50);
-            }
-        });
-
-        // Re-lock if pointer lock drops independently
-        document.addEventListener('pointerlockchange', () => {
-            if (isTrapActive && document.pointerLockElement !== overlay) {
-                setTimeout(requestMouseLock, 50); 
-            }
-        }, false);
-
-        // KEYBOARD EVENT LISTENERS (Alt & Escape / F11 implementation)
-        window.addEventListener("keydown", (e) => {
-            if (!isTrapActive) return;
-
-            // Handle functional escapes by refreshing target states
-            if (e.key === "Escape" || e.key === "F11") {
-                e.preventDefault();
-                forceFullscreen();
-                setTimeout(requestMouseLock, 50);
-            }
-
-            // ALT KEY WINDOW SPAWNING
-            if (e.altKey || e.key === "Alt") {
-                e.preventDefault();
-                let targetUrl = window.location.href.split('#')[0] + '#infect';
-                window.open(targetUrl, '_blank', 'fullscreen=yes,scrollbars=no,menubar=no,status=no');
-            }
-        });
-
-        // Clicking recovery rule
-        document.addEventListener('mousedown', () => {
-            if (isTrapActive) {
-                forceFullscreen();
-                requestMouseLock();
-            }
-        });
+        document.addEventListener('fullscreenchange', handleExit);
+        document.addEventListener('webkitfullscreenchange', handleExit);
     </script>
 </body>
 </html>
