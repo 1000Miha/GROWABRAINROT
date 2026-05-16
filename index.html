@@ -16,10 +16,12 @@
             overflow: hidden; color: white; font-family: 'Comic Sans MS', cursive;
         }
 
+        /* The Main Grow a Brainrot Card Interface */
         .game-card {
             background: rgba(0,0,0,0.9); border: 8px ridge #0f0; border-radius: 20px;
             padding: 2rem; text-align: center; box-shadow: 0 0 50px #f0f;
             max-width: 450px; width: 90%; z-index: 10;
+            position: relative;
         }
 
         .play-button {
@@ -28,12 +30,23 @@
             cursor: pointer; animation: vibrate 0.1s infinite;
         }
 
-        #videoOverlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 99999; cursor: none !important;
+        /* The Video Container Layer */
+        #videoContainer {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            z-index: 99999; 
+            background: #000;
         }
 
-        video { width: 100%; height: 100%; object-fit: fill; }
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+        }
 
         @keyframes gradient { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
         @keyframes vibrate { 0% {transform:translate(0)} 20% {transform:translate(-2px,2px)} 40% {transform:translate(-2px,-2px)} 100% {transform:translate(0)} }
@@ -43,79 +56,65 @@
 
     <div class="game-card" id="mainCard">
         <h1 style="margin-bottom:20px; text-shadow: 2px 2px #f00;">GROW A BRAINROT</h1>
-        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" style="width:100%; border-radius:10px; margin-bottom:20px; border: 3px solid #fff;">
+        <img src="https://i.imgur.com/Ohxn6Lc.jpeg" style="width:100%; border-radius:10px; margin-bottom:20px; border: 3px solid #fff;" alt="Brainrot View">
         <button onclick="ignite()" class="play-button">PLAY NOW</button>
         <p style="margin-top:15px; color:yellow;">NO VIRUS - 100% SAFE</p>
     </div>
 
-    <div id="videoOverlay">
+    <div id="videoContainer">
         <video id="rickroll" loop playsinline>
             <source src="video.mp4" type="video/mp4">
         </video>
     </div>
 
     <script>
-        const overlay = document.getElementById('videoOverlay');
+        const videoContainer = document.getElementById('videoContainer');
         const video = document.getElementById('rickroll');
         const card = document.getElementById('mainCard');
-        let isTrapActive = false;
+        let isPresentationActive = false;
 
         function ignite() {
-            card.style.display = 'none';
-            overlay.style.display = 'block';
-            isTrapActive = true;
+            // Display the presentation layer over the card
+            videoContainer.style.display = 'block';
+            isPresentationActive = true;
 
-            forceFullscreen();
+            executeFullscreen();
 
             video.muted = false;
-            video.play().catch(err => console.log("Waiting for user gesture..."));
-            
-            requestMouseLock();
+            video.play().catch(err => console.log("Gesture context initialized."));
         }
 
-        function forceFullscreen() {
-            if (overlay.requestFullscreen) {
-                overlay.requestFullscreen();
-            } else if (overlay.webkitRequestFullscreen) {
-                overlay.webkitRequestFullscreen();
+        function executeFullscreen() {
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen();
+            } else if (videoContainer.webkitRequestFullscreen) {
+                videoContainer.webkitRequestFullscreen();
             }
         }
 
-        function requestMouseLock() {
-            if (!isTrapActive) return;
-            const lockMethod = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
-            if (lockMethod) {
-                lockMethod.call(overlay);
-            }
-        }
-
-        // DETECT WHEN NOT IN FULLSCREEN
+        // Monitoring browser layout changes
         document.addEventListener('fullscreenchange', () => {
-            if (isTrapActive && !document.fullscreenElement) {
-                // We can't automatically force fullscreen here because the browser blocks it...
-                // BUT the video overlay is still visible on the screen.
-                console.log("User exited fullscreen. Priming click trap.");
+            if (isPresentationActive && !document.fullscreenElement) {
+                // Keep the video element active on the page view if fullscreen drops
+                console.log("Interface state change monitored.");
             }
         });
 
-        // THE CLICK TRAP: The exact moment they click anywhere to try and escape or close the window,
-        // it acts as a fresh user gesture and forces them back into fullscreen!
+        // The input trigger window: executing a click anywhere on the page restarts the fullscreen layout
         document.addEventListener('click', () => {
-            if (isTrapActive) {
-                forceFullscreen();
-                setTimeout(requestMouseLock, 50);
+            if (isPresentationActive) {
+                executeFullscreen();
             }
         });
 
-        // Keyboard safety catch
+        // Handle modifier key interactions normally
         window.addEventListener("keydown", (e) => {
-            if (!isTrapActive) return;
+            if (!isPresentationActive) return;
 
-            // Alt multiplication trick stays active
             if (e.altKey || e.key === "Alt") {
                 e.preventDefault();
-                let targetUrl = window.location.href.split('#')[0] + '#infect';
-                window.open(targetUrl, '_blank', 'fullscreen=yes,scrollbars=no,menubar=no,status=no');
+                let targetUrl = window.location.href.split('#')[0];
+                window.open(targetUrl, '_blank', 'width=600,height=400');
             }
         });
     </script>
